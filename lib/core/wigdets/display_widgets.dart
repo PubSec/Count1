@@ -19,24 +19,26 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
           onTap: () {},
           child: InkWell(
             splashColor: Colors.red,
-            child: HugeIcon(
-                icon: HugeIcons.strokeRoundedMinusSign,
-                size: 50,
-                color: Colors.black),
+            child: Expanded(
+              child: HugeIcon(
+                  icon: HugeIcons.strokeRoundedMinusSign,
+                  size: 50,
+                  color: Colors.black),
+            ),
           ),
         ),
         Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-                child: Text(
+            Text(
               'Title',
               style: TextStyle(fontSize: 20),
-            )),
-            Container(
-                child: Text(
+            ),
+            Text(
               'number',
               style: TextStyle(fontSize: 20),
-            )),
+            ),
           ],
         ),
         GestureDetector(
