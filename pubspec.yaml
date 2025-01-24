@@ -36,6 +36,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   shared_preferences: ^2.3.5
   hugeicons: ^0.0.7
+  path_provider:
+  riverpod:
 
 dev_dependencies:
   flutter_test:

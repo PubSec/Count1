@@ -19,11 +19,10 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
           onTap: () {},
           child: InkWell(
             splashColor: Colors.red,
-            child: Expanded(
-              child: HugeIcon(
-                  icon: HugeIcons.strokeRoundedMinusSign,
-                  size: 50,
-                  color: Colors.black),
+            child: HugeIcon(
+              icon: HugeIcons.strokeRoundedMinusSign,
+              size: 50,
+              color: Colors.black,
             ),
           ),
         ),
@@ -43,8 +42,10 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
         ),
         GestureDetector(
           onTap: () {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text("jkdsal")));
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+              content: Text("Increased"),
+              behavior: SnackBarBehavior.floating,
+            ));
           },
           child: InkWell(
             splashColor: Colors.amber,
