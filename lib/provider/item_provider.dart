@@ -7,5 +7,7 @@ class ItemProvider extends Notifier<Future<List<CounterModel>>> {
     return Future.value([]);
   }
 
-  Future<List<CounterModel>> getItems() async {}
+  Future<List<CounterModel>> getItems() async {
+    return Future.value([]);
+  }
 }
