@@ -8,7 +8,7 @@
 PRODUCT_NAME = count1
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = io.github.pubsec.count1.count1
+PRODUCT_BUNDLE_IDENTIFIER = io.github.pubsec.count1
 
 // The copyright displayed in application information
 PRODUCT_COPYRIGHT = Copyright © 2025 io.github.pubsec.count1. All rights reserved.

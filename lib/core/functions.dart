@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 selectedButton(BuildContext context, item) {
   switch (item) {
     case 0:
-      print('WIP');
+      debugPrint('WIP');
       break;
     case 1:
       showDialog(

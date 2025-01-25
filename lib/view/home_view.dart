@@ -1,16 +1,19 @@
 import 'package:count1/core/functions.dart';
 import 'package:count1/core/wigdets/display_widgets.dart';
+import 'package:count1/model/counter_model.dart';
+import 'package:count1/provider/item_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
 
-class HomeView extends StatefulWidget {
+class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  ConsumerState<HomeView> createState() => _HomeViewState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _HomeViewState extends ConsumerState<HomeView> {
   final TextEditingController _titletextEditingController =
       TextEditingController();
   final TextEditingController _valuetextEditingController =
@@ -40,6 +43,8 @@ class _HomeViewState extends State<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final getItems = ref.watch(itemNotifierProvider.notifier).getItems();
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Count1"),
@@ -59,8 +64,27 @@ class _HomeViewState extends State<HomeView> {
           )
         ],
       ),
-      body: Column(
-        children: [DisplayWidgets(), DisplayWidgets()],
+      body: SingleChildScrollView(
+        child: FutureBuilder(
+          future: getItems,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return CircularProgressIndicator();
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Text('No data'),
+              );
+            } else {
+              List<CounterModel> items = snapshot.data!;
+              return ListView.builder(itemBuilder: (context, index) {
+                return DisplayWidgets(
+                  title: items[index].title,
+                  value: items[index].value,
+                );
+              });
+            }
+          },
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
@@ -96,25 +120,26 @@ class _HomeViewState extends State<HomeView> {
                     ),
                   ),
                   TextButton(
-                      onPressed: () {
-                        if (validDataEntered()) {
-                          Navigator.of(context).pop();
-                          _titletextEditingController.clear();
-                          _valuetextEditingController.clear();
-                        } else {
-                          showDialog(
-                            context: context,
-                            builder: (BuildContext context) {
-                              return AlertDialog(
-                                title: Text('Error'),
-                                content:
-                                    Text('Title and value can\'t be empty'),
-                              );
-                            },
-                          );
-                        }
-                      },
-                      child: Text('Save'))
+                    onPressed: () {
+                      if (validDataEntered()) {
+                        Navigator.of(context).pop();
+                        _titletextEditingController.clear();
+                        _valuetextEditingController.clear();
+                        
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return AlertDialog(
+                              title: Text('Error'),
+                              content: Text('Title and value can\'t be empty'),
+                            );
+                          },
+                        );
+                      }
+                    },
+                    child: Text('Save'),
+                  )
                 ],
               ),
             ),

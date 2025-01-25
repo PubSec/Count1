@@ -1,6 +1,6 @@
 class CounterModel {
   String title;
-  int value;
+  String value;
 
   CounterModel({required this.title, required this.value});
 }

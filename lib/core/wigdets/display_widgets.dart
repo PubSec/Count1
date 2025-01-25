@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:hugeicons/hugeicons.dart';
 
 class DisplayWidgets extends StatefulWidget {
-  const DisplayWidgets({super.key});
+  final String title;
+  final String value;
+  const DisplayWidgets({super.key, required this.title, required this.value});
 
   @override
   State<DisplayWidgets> createState() => _DisplayWidgetsState();
@@ -31,11 +33,11 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(
-              'Title',
+              widget.title,
               style: TextStyle(fontSize: 20),
             ),
             Text(
-              'number',
+              widget.value,
               style: TextStyle(fontSize: 20),
             ),
           ],
