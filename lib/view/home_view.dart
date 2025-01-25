@@ -2,6 +2,7 @@ import 'package:count1/core/functions.dart';
 import 'package:count1/core/wigdets/display_widgets.dart';
 import 'package:count1/model/counter_model.dart';
 import 'package:count1/provider/item_provider.dart';
+import 'package:count1/provider/save_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hugeicons/hugeicons.dart';
@@ -122,10 +123,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
                   TextButton(
                     onPressed: () {
                       if (validDataEntered()) {
+                        ref.read(saveService).saveItem(
+                            _titletextEditingController.text,
+                            _valuetextEditingController.text);
                         Navigator.of(context).pop();
                         _titletextEditingController.clear();
                         _valuetextEditingController.clear();
-                        
                       } else {
                         showDialog(
                           context: context,
