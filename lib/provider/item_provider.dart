@@ -30,9 +30,13 @@ class ItemNotifier extends Notifier<Future<List<CounterModel>>> {
     return Future.value([]);
   }
 
-  dynamic setItems(String title, String value) {
+  dynamic setItems(String title, String value) async {
     print("Title ${title}");
     print(value);
+    var appDir = await getApplicationDocumentsDirectory();
+    String filePath = "${appDir.path}/user_data.txt";
+    File file = File(filePath);
+    file.writeAsString("$title $value\n");
   }
 }
 
