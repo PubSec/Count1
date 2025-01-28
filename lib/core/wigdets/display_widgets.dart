@@ -18,7 +18,9 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         GestureDetector(
-          onTap: () {},
+          onTap: () {
+            /// Decreasey
+          },
           child: InkWell(
             splashColor: Colors.red,
             child: HugeIcon(
@@ -44,10 +46,14 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
         ),
         GestureDetector(
           onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text("Increased"),
-              behavior: SnackBarBehavior.floating,
-            ));
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("Increased"),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+
+            /// Increment one
           },
           child: InkWell(
             splashColor: Colors.amber,
