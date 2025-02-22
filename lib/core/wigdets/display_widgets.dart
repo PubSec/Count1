@@ -19,7 +19,7 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
       children: [
         GestureDetector(
           onTap: () {
-            /// Decreasey
+            /// Decrease a
           },
           child: InkWell(
             splashColor: Colors.red,
