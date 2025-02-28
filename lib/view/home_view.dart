@@ -1,10 +1,8 @@
 import 'package:count1/core/functions.dart';
-import 'package:count1/core/wigdets/display_widgets.dart';
-import 'package:count1/model/counter_model.dart';
-import 'package:count1/provider/item_provider.dart';
-import 'package:count1/provider/save_item.dart';
+import 'package:count1/wigdets/display_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:sqflite/sqflite.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -41,10 +39,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
     super.dispose();
   }
 
+  showDataBase() async {
+    var databasesPath = await getDatabasesPath();
+    String path = "$databasesPath/'test-db.db'";
+
+    Database database = await openDatabase(
+      path,
+      version: 1,
+      onOpen: (Database db) async {
+        await db.execute('SELECT * FROM Name');
+      },
+    );
+    var data = database.query('Name');
+    return data;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final getItems = ref.watch(itemNotifierProvider.notifier).getItems();
-
     return Scaffold(
       appBar: AppBar(
         title: Text("Count1"),
@@ -59,28 +70,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        child: FutureBuilder(
-          future: getItems,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('No data'));
-            } else {
-              List<CounterModel> items = snapshot.data!;
-              return ListView.builder(
-                itemBuilder: (context, index) {
-                  return DisplayWidgets(
-                    title: items[index].title,
-                    value: items[index].value,
-                  );
-                },
-              );
-            }
-          },
-        ),
-      ),
+      body: Text(''),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -114,30 +104,23 @@ class _HomeViewState extends ConsumerState<HomeView> {
                         ),
                       ),
                       TextButton(
-                        onPressed: () {
-                          if (validDataEntered()) {
-                            ref
-                                .read(saveService)
-                                .saveItem(
-                                  _titletextEditingController.text,
-                                  _valuetextEditingController.text,
-                                );
-                            Navigator.of(context).pop();
-                            _titletextEditingController.clear();
-                            _valuetextEditingController.clear();
-                          } else {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                return AlertDialog(
-                                  title: Text('Error'),
-                                  content: Text(
-                                    'Title and value can\'t be empty',
-                                  ),
-                                );
-                              },
+                        onPressed: () async {
+                          Database database = await openDatabase(
+                            'test-db.db',
+                            version: 1,
+                            onCreate: (Database db, int version) async {
+                              await db.execute(
+                                'CREATE TABLE "Name" ("id"	INTEGER,"title"	TEXT,"count_number"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT))',
+                              );
+                            },
+                          );
+                          await database.transaction((txn) async {
+                            int id1 = await txn.rawInsert(
+                              'INSERT INTO "Name" ("title", "count_number") VALUES ("${_titletextEditingController.text}", ${int.parse(_valuetextEditingController.text)})',
                             );
-                          }
+                            // ignore: unnecessary_brace_in_string_interps
+                            print("Inserted to ${id1}");
+                          });
                         },
                         child: Text('Save'),
                       ),
