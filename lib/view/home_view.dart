@@ -46,11 +46,12 @@ class _HomeViewState extends ConsumerState<HomeView> {
     Database database = await openDatabase(
       path,
       version: 1,
-      onOpen: (Database db) async {
+      onOpen: (Database db, int version) async {
         await db.execute('SELECT * FROM Name');
       },
     );
-    var data = database.query('Name');
+    // var data = database.query('Name');
+
     return data;
   }
 
