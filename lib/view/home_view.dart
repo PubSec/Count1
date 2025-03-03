@@ -46,13 +46,13 @@ class _HomeViewState extends ConsumerState<HomeView> {
     Database database = await openDatabase(
       path,
       version: 1,
-      onOpen: (Database db, int version) async {
+      onOpen: (Database db) async {
         await db.execute('SELECT * FROM Name');
       },
     );
     // var data = database.query('Name');
 
-    return data;
+    return database.toString();
   }
 
   @override
@@ -71,7 +71,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ],
       ),
-      body: Text(''),
+      body: Text(showDataBase()),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
