@@ -1,4 +1,6 @@
 import 'package:count1/core/functions.dart';
+import 'package:count1/model/entry_model.dart';
+import 'package:count1/provider/data_provider.dart';
 import 'package:count1/wigdets/display_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,24 +41,10 @@ class _HomeViewState extends ConsumerState<HomeView> {
     super.dispose();
   }
 
-  showDataBase() async {
-    var databasesPath = await getDatabasesPath();
-    String path = "$databasesPath/'test-db.db'";
-
-    Database database = await openDatabase(
-      path,
-      version: 1,
-      onOpen: (Database db) async {
-        await db.execute('SELECT * FROM Name');
-      },
-    );
-    // var data = database.query('Name');
-
-    return database.toString();
-  }
-
   @override
   Widget build(BuildContext context) {
+    final dataProvider =
+        ref.watch(dataProviderNotifier.notifier).showDataBase();
     return Scaffold(
       appBar: AppBar(
         title: Text("Count1"),
@@ -71,7 +59,42 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ],
       ),
-      body: Text(showDataBase()),
+      body: FutureBuilder(
+        future: dataProvider,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            // While the future is loading
+
+            return Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            // If there was an error
+
+            return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (!snapshot.hasData) {
+            // If the data is empty
+
+            return Center(child: Text('No entries found.'));
+          } else {
+            // If the data is available
+
+            List<EntryModel> entries = snapshot.data!;
+
+            return ListView.separated(
+              cacheExtent: 5,
+              itemCount: entries.length,
+              itemBuilder: (context, index) {
+                return DisplayWidgets(
+                  title: entries[index].title,
+                  value: entries[index].initialValue,
+                );
+              },
+              separatorBuilder:
+                  (BuildContext context, int index) => SizedBox(height: 20),
+            );
+          }
+        },
+      ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -119,8 +142,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                             int id1 = await txn.rawInsert(
                               'INSERT INTO "Name" ("title", "count_number") VALUES ("${_titletextEditingController.text}", ${int.parse(_valuetextEditingController.text)})',
                             );
-                            // ignore: unnecessary_brace_in_string_interps
-                            print("Inserted to ${id1}");
+                            debugPrint("Inserted to $id1");
                           });
                         },
                         child: Text('Save'),
@@ -130,7 +152,7 @@ class _HomeViewState extends ConsumerState<HomeView> {
                 ),
           );
         },
-        child: Icon(Icons.plus_one),
+        child: Icon(Icons.add),
       ),
     );
   }

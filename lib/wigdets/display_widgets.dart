@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 class DisplayWidgets extends StatefulWidget {
   final String title;
-  final String value;
+  final int value;
   const DisplayWidgets({super.key, required this.title, required this.value});
 
   @override
@@ -17,12 +17,10 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         GestureDetector(
-          onTap: () {
-            /// Decrease a
-          },
+          onTap: () {},
           child: InkWell(
             splashColor: Colors.red,
-            child: Icon(Icons.add_ic_call_outlined),
+            child: Icon(Icons.exposure_minus_1_outlined),
           ),
         ),
         Column(
@@ -30,7 +28,7 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Text(widget.title, style: TextStyle(fontSize: 20)),
-            Text(widget.value, style: TextStyle(fontSize: 20)),
+            Text("${widget.value}", style: TextStyle(fontSize: 20)),
           ],
         ),
         GestureDetector(
@@ -41,12 +39,10 @@ class _DisplayWidgetsState extends State<DisplayWidgets> {
                 behavior: SnackBarBehavior.floating,
               ),
             );
-
-            /// Increment one
           },
           child: InkWell(
             splashColor: Colors.amber,
-            child: Icon(Icons.add_ic_call_outlined),
+            child: Icon(Icons.plus_one),
           ),
         ),
       ],
