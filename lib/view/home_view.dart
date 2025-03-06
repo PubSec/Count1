@@ -1,10 +1,8 @@
 import 'package:count1/core/functions.dart';
 import 'package:count1/model/entry_model.dart';
-import 'package:count1/provider/data_provider.dart';
 import 'package:count1/wigdets/display_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:sqflite/sqflite.dart';
 
 class HomeView extends ConsumerStatefulWidget {
   const HomeView({super.key});
@@ -20,31 +18,26 @@ class _HomeViewState extends ConsumerState<HomeView> {
       TextEditingController();
 
   bool validDataEntered() {
-    if (_titletextEditingController.text.isEmpty ||
-        _valuetextEditingController.text.isEmpty) {
-      return false;
-    }
-    return true;
+    return _titletextEditingController.text.isNotEmpty &&
+        _valuetextEditingController.text.isNotEmpty;
   }
 
   @override
   void initState() {
-    _titletextEditingController;
-    _valuetextEditingController;
     super.initState();
   }
 
   @override
   void dispose() {
-    _titletextEditingController;
-    _valuetextEditingController;
+    _titletextEditingController.dispose();
+    _valuetextEditingController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final dataProvider =
-        ref.watch(dataProviderNotifier.notifier).showDataBase();
+    final provider = EntryProvider();
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Count1"),
@@ -59,24 +52,16 @@ class _HomeViewState extends ConsumerState<HomeView> {
           ),
         ],
       ),
-      body: FutureBuilder(
-        future: dataProvider,
+      body: FutureBuilder<List<EntryModel>>(
+        future: provider.getAllEntries(), // Fetch entries from the provider
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            // While the future is loading
-
             return Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            // If there was an error
-
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData) {
-            // If the data is empty
-
+          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
             return Center(child: Text('No entries found.'));
           } else {
-            // If the data is available
-
             List<EntryModel> entries = snapshot.data!;
 
             return ListView.separated(
@@ -94,7 +79,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
           }
         },
       ),
-
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showModalBottomSheet(
@@ -112,7 +96,6 @@ class _HomeViewState extends ConsumerState<HomeView> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           hintText: 'Title',
-                          hintFadeDuration: Duration(milliseconds: 440),
                         ),
                       ),
                       SizedBox(height: 10),
@@ -124,26 +107,31 @@ class _HomeViewState extends ConsumerState<HomeView> {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           hintText: 'Initial value',
-                          hintFadeDuration: Duration(milliseconds: 440),
                         ),
                       ),
                       TextButton(
                         onPressed: () async {
-                          Database database = await openDatabase(
-                            'test-db.db',
-                            version: 1,
-                            onCreate: (Database db, int version) async {
-                              await db.execute(
-                                'CREATE TABLE "Name" ("id"	INTEGER,"title"	TEXT,"count_number"	INTEGER,PRIMARY KEY("id" AUTOINCREMENT))',
-                              );
-                            },
-                          );
-                          await database.transaction((txn) async {
-                            int id1 = await txn.rawInsert(
-                              'INSERT INTO "Name" ("title", "count_number") VALUES ("${_titletextEditingController.text}", ${int.parse(_valuetextEditingController.text)})',
+                          if (validDataEntered()) {
+                            await provider.open();
+                            EntryModel newEntry = EntryModel();
+                            newEntry.title = _titletextEditingController.text;
+                            newEntry.initialValue = int.parse(
+                              _valuetextEditingController.text,
+                            ); // Convert to int
+                            await provider.insert(newEntry);
+                            _titletextEditingController
+                                .clear(); // Clear the text fields
+                            _valuetextEditingController.clear();
+                            Navigator.pop(context); // Close the bottom sheet
+                            setState(() {}); // Refresh the FutureBuilder
+                          } else {
+                            // Show an error message if data is invalid
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Please enter valid data.'),
+                              ),
                             );
-                            debugPrint("Inserted to $id1");
-                          });
+                          }
                         },
                         child: Text('Save'),
                       ),
